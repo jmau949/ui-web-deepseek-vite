@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Account</title>
+    <style>
+      /* Base styles with shadcn/New York aesthetics */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        line-height: 1.5;
+        color: #09090b;
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        border-radius: 6px;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 32px;
+        border: 1px solid #e4e4e7;
+      }
+
+      .header {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+
+      .logo {
+        height: 40px;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+        color: #09090b;
+      }
+
+      p {
+        font-size: 16px;
+        color: #52525b;
+        margin: 16px 0;
+      }
+
+      .code-container {
+        background-color: #f4f4f5;
+        border-radius: 4px;
+        padding: 24px;
+        margin: 24px 0;
+        text-align: center;
+      }
+
+      .verification-code {
+        font-family: "Courier New", monospace;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        color: #09090b;
+      }
+
+      .hint {
+        font-size: 14px;
+        color: #71717a;
+        margin-top: 24px;
+      }
+
+      .footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 14px;
+        color: #71717a;
+      }
+
+      .divider {
+        height: 1px;
+        background-color: #e4e4e7;
+        margin: 24px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <!-- Replace with your actual logo -->
+          <div
+            style="
+              background-color: #09090b;
+              color: white;
+              width: 40px;
+              height: 40px;
+              line-height: 40px;
+              text-align: center;
+              border-radius: 6px;
+              margin: 0 auto;
+              font-weight: bold;
+            "
+          >
+            JM
+          </div>
+          <h1>Verify Your Account</h1>
+        </div>
+
+        <p>
+          Thank you for registering. To complete your account setup, please use
+          the verification code below:
+        </p>
+
+        <div class="code-container">
+          <div class="verification-code">{####}</div>
+        </div>
+
+        <p>
+          This verification code will expire in 24 hours. If you did not request
+          this code, please ignore this email.
+        </p>
+
+        <div class="hint">
+          For security reasons, please never share this code with anyone.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+          <p>© 2025 Jonathan Mau</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
