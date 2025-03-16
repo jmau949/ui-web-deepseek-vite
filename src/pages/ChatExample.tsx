@@ -52,7 +52,7 @@ const ChatExample: React.FC = () => {
             Logged in as: <strong>{username}</strong>
           </p>
           <WebSocketChat
-            websocketUrl="ws://localhost:3000"
+            websocketUrl="wss://ws.jonathanmau.com"
             username={username}
             onAuthError={handleAuthError}
           />
