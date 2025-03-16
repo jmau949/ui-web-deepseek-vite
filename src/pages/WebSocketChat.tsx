@@ -213,13 +213,12 @@ const WebSocketChat: React.FC<ChatProps> = ({
       </div>
 
       {/* Connection information (useful for development) */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="debug-info">
-          <p>Connection ID: {connectionId || "None"}</p>
-          <p>Connected: {isConnected ? "Yes" : "No"}</p>
-          {authError && <p className="error">Auth Error: {authError}</p>}
-        </div>
-      )}
+
+      <div className="debug-info">
+        <p>Connection ID: {connectionId || "None"}</p>
+        <p>Connected: {isConnected ? "Yes" : "No"}</p>
+        {authError && <p className="error">Auth Error: {authError}</p>}
+      </div>
 
       {/* Basic styles - in production you'd use a proper CSS/SCSS file */}
       <style>{`
