@@ -15,7 +15,7 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ConfirmEmailPage from "./pages/auth/ConfirmEmailPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
-
+import ChatExample from "./pages/ChatExample";
 const App: React.FC = () => (
   <ErrorBoundary>
     <Provider store={store}>
@@ -36,7 +36,7 @@ const App: React.FC = () => (
                   path="/"
                   element={
                     <PrivateRoute>
-                      <HomePage />
+                      <ChatExample />
                     </PrivateRoute>
                   }
                 />
