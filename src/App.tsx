@@ -1,6 +1,8 @@
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import RootLayout from "./layouts/RootLayout";
 import PrivateRoute from "./components/PrivateRoute";
+import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
 import { AuthProvider } from "./auth/AuthProvider";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import { Provider } from "react-redux";
@@ -16,6 +18,10 @@ import ConfirmEmailPage from "./pages/auth/ConfirmEmailPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
 import ChatExample from "./pages/ChatExample";
+
+/**
+ * Main application component handling routing and global providers
+ */
 const App: React.FC = () => (
   <ErrorBoundary>
     <Provider store={store}>
@@ -24,6 +30,7 @@ const App: React.FC = () => (
           <Router>
             <RootLayout>
               <Routes>
+                {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
                 <Route
@@ -32,15 +39,30 @@ const App: React.FC = () => (
                 />
                 <Route path="/confirm-email" element={<ConfirmEmailPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+                {/* Private routes with AuthenticatedLayout */}
                 <Route
                   path="/"
                   element={
                     <PrivateRoute>
-                      <ChatExample />
+                      <AuthenticatedLayout>
+                        <HomePage />
+                      </AuthenticatedLayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/chat"
+                  element={
+                    <PrivateRoute>
+                      <AuthenticatedLayout>
+                        <ChatExample />
+                      </AuthenticatedLayout>
                     </PrivateRoute>
                   }
                 />
 
+                {/* Catch-all route */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </RootLayout>

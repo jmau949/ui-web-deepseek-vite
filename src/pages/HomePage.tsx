@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col">
       <MetaTags title="AI Assistant" description="Your personal AI assistant" />
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-12">
