@@ -222,7 +222,7 @@ const WebSocketChat: React.FC<ChatProps> = ({
       )}
 
       {/* Basic styles - in production you'd use a proper CSS/SCSS file */}
-      <style jsx>{`
+      <style>{`
         .chat-container {
           display: flex;
           flex-direction: column;

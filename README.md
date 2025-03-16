@@ -90,7 +90,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: import.meta.env.VITE_REQUEST_TIMEOUT || 10000,
+  timeout: import.meta.env.VITE_REQUEST_TIMEOUT || 6000,
   // Enable sending cookies and other credentials with requests to support sessions
   withCredentials: true,
 });

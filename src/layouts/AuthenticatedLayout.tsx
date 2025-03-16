@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import Navbar from "../components/Navbar";
-import { useAuth } from "@/auth/AuthProvider";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
@@ -13,8 +12,6 @@ interface AuthenticatedLayoutProps {
 const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({
   children,
 }) => {
-  const { user } = useAuth();
-
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />

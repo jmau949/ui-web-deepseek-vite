@@ -66,7 +66,7 @@ const ChatExample: React.FC = () => {
       )}
 
       {/* Basic styles - in production you'd use a proper CSS/SCSS file */}
-      <style jsx>{`
+      <style>{`
         .chat-example {
           max-width: 800px;
           margin: 0 auto;
