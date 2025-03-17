@@ -89,6 +89,20 @@ const useWebSocket = (url: string): UseWebSocketReturn => {
         console.log(`WebSocket disconnected: ${event.code} ${event.reason}`);
         setIsConnected(false);
         setSocket(null);
+        console.log(
+          "WebSocket closed with code:",
+          event.code,
+          "reason:",
+          event.reason
+        );
+        // WebSocket close codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+        if (event.code === 1000) {
+          console.log("Normal closure");
+        } else if (event.code === 1006) {
+          console.log("Abnormal closure - likely server-side issue");
+        } else if (event.code === 1008) {
+          console.log("Policy violation - likely auth issues");
+        }
 
         // Authentication errors are typically code 1000 (normal closure) or 1006 (abnormal closure)
         // but with API Gateway, we need to look for specific patterns
