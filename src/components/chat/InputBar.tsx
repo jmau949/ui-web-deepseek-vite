@@ -10,6 +10,7 @@ interface InputBarProps {
   maxRows?: number;
   autoFocus?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export const InputBar: React.FC<InputBarProps> = ({
@@ -19,6 +20,7 @@ export const InputBar: React.FC<InputBarProps> = ({
   maxRows = 5,
   autoFocus = true,
   className = "",
+  disabled = false,
 }) => {
   const [input, setInput] = useState("");
   const [rows, setRows] = useState(1);
@@ -43,7 +45,7 @@ export const InputBar: React.FC<InputBarProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedInput = input.trim();
-    if (trimmedInput && !isSubmitting) {
+    if (trimmedInput && !isSubmitting && !disabled) {
       onSubmit(trimmedInput);
       setInput("");
     }
@@ -69,13 +71,13 @@ export const InputBar: React.FC<InputBarProps> = ({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={rows}
-        disabled={isSubmitting}
+        disabled={isSubmitting || disabled}
         className="flex-grow min-h-10 resize-none p-3"
         aria-label="Message input"
       />
       <Button
         type="submit"
-        disabled={!input.trim() || isSubmitting}
+        disabled={!input.trim() || isSubmitting || disabled}
         className="h-10 px-4"
       >
         {isSubmitting ? (

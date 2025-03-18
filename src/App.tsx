@@ -17,7 +17,6 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ConfirmEmailPage from "./pages/auth/ConfirmEmailPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
-import ChatExample from "./pages/ChatExample";
 
 /**
  * Main application component handling routing and global providers
@@ -51,17 +50,6 @@ const App: React.FC = () => (
                     </PrivateRoute>
                   }
                 />
-                <Route
-                  path="/chat"
-                  element={
-                    <PrivateRoute>
-                      <AuthenticatedLayout>
-                        <ChatExample />
-                      </AuthenticatedLayout>
-                    </PrivateRoute>
-                  }
-                />
-
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
