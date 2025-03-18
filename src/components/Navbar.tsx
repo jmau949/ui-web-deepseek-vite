@@ -1,58 +1,45 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { UserMenu } from "./UserMenu";
+import React from "react";
 import { useAuth } from "../auth/AuthProvider";
+import { UserMenu } from "./UserMenu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 /**
- * Simple navbar with mobile-first design, navigation links, and user avatar dropdown
+ * Simplified navbar with model selector on the left and logout on the right
+ * Using shadcn components
  */
 const Navbar: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
   const { user, logout } = useAuth();
 
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Chat", path: "/chat" },
-  ];
+  // The currently selected model
+  const selectedModel = "Deepseek-r1";
 
   return (
     <header className="w-full bg-background border-b border-border sticky top-0 z-50">
       <nav className="px-4 py-3 md:px-6 md:py-4 flex justify-between items-center">
-        {/* Logo */}
-        <div className="font-bold text-lg">AppLogo</div>
+        {/* Model dropdown menu using shadcn components - left aligned */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-2">
+              {selectedModel}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem className="font-medium">
+              Deepseek-r1
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden p-2 text-foreground"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle navigation menu"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        {/* Desktop navigation links */}
-        <div className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "font-medium hover:text-primary transition-colors",
-                location.pathname === item.path
-                  ? "text-primary"
-                  : "text-foreground"
-              )}
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-
-        {/* User avatar and dropdown - visible on desktop */}
-        <div className="hidden md:block">
+        {/* User menu with logout - right aligned */}
+        <div>
           <UserMenu
             firstName={user.firstName}
             lastName={user.lastName}
@@ -60,40 +47,6 @@ const Navbar: React.FC = () => {
           />
         </div>
       </nav>
-
-      {/* Mobile navigation menu */}
-      {isMenuOpen && (
-        <div className="md:hidden p-4 bg-background border-t border-border animate-in slide-in-from-top">
-          <div className="space-y-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "block py-2 font-medium hover:text-primary transition-colors",
-                  location.pathname === item.path
-                    ? "text-primary"
-                    : "text-foreground"
-                )}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <div className="pt-4 border-t border-border">
-              <UserMenu
-                firstName={user.firstName}
-                lastName={user.lastName}
-                onLogout={() => {
-                  logout();
-                  setIsMenuOpen(false);
-                }}
-                isMobile
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
