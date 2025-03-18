@@ -135,7 +135,6 @@ const HomePage: React.FC = () => {
             <InputBar
               onSubmit={handleSubmit}
               disabled={!isConnected}
-              placeholder="Send a message..."
               autoFocus={true}
               className="w-full"
             />
@@ -153,7 +152,6 @@ const HomePage: React.FC = () => {
               <InputBar
                 onSubmit={handleSubmit}
                 disabled={!isConnected}
-                placeholder="Send a message..."
                 autoFocus={true}
                 className="w-full"
               />
