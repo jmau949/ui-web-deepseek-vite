@@ -53,10 +53,10 @@ const HomePage: React.FC = () => {
    */
   const handleIncomingMessage = (wsResponse: any) => {
     // Handle both message formats that could come from the server
-    if (wsResponse.data?.message) {
+    if (wsResponse.data?.text) {
       const newMessage: ChatMessage = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        content: wsResponse.data.message,
+        content: wsResponse.data.text,
         role: "system",
         timestamp: new Date(wsResponse.data.timestamp || Date.now()),
       };
@@ -64,13 +64,13 @@ const HomePage: React.FC = () => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setInputStarted(true);
     } else if (
-      wsResponse.message &&
-      !wsResponse.message.includes("Connected to WebSocket")
+      wsResponse.text &&
+      !wsResponse.text.includes("Connected to WebSocket")
     ) {
       // For system messages, excluding the initial connection message
       const newMessage: ChatMessage = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        content: wsResponse.message,
+        content: wsResponse.text,
         role: "system",
         timestamp: new Date(),
       };
