@@ -66,7 +66,7 @@ export const InputBar: React.FC<InputBarProps> = ({
         onSubmit={handleSubmit}
         className="flex w-full gap-2 items-end relative border rounded-xl bg-background shadow-sm focus-within:ring-1 focus-within:ring-ring overflow-hidden"
       >
-        {/* Feature buttons - currently non-functional but add visual appeal */}
+        {/* Feature buttons - currently non-functional but add visual appeal
         <div className="flex items-center pl-3 gap-1.5">
           <Button
             type="button"
@@ -88,7 +88,7 @@ export const InputBar: React.FC<InputBarProps> = ({
             <PaperclipIcon className="h-4 w-4" />
             <span className="sr-only">Attach</span>
           </Button>
-        </div>
+        </div> */}
 
         <Textarea
           ref={textareaRef}
@@ -103,7 +103,7 @@ export const InputBar: React.FC<InputBarProps> = ({
         />
 
         {/* Voice input button - non-functional but adds visual appeal */}
-        <Button
+        {/* <Button
           type="button"
           variant="ghost"
           size="icon"
@@ -112,7 +112,7 @@ export const InputBar: React.FC<InputBarProps> = ({
         >
           <Mic className="h-4 w-4" />
           <span className="sr-only">Voice input</span>
-        </Button>
+        </Button> */}
 
         <Button
           type="submit"
