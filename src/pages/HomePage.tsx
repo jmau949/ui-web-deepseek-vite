@@ -4,6 +4,17 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ChatMessage } from "@/types/chat";
 import useWebSocket from "../hooks/useWebSockets";
 import { useAuth } from "@/auth/AuthProvider";
+import {
+  AlertCircle,
+  MoreVertical,
+  RefreshCw,
+  User,
+  ArrowDown,
+  Trash2,
+  Settings,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Define your WebSocket server URL
 const WS_URL = import.meta.env.VITE_WS_URL;
@@ -12,10 +23,12 @@ const HomePage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputStarted, setInputStarted] = useState<boolean>(false);
   const [reconnectTrigger, setReconnectTrigger] = useState(0);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const hasUserTyped = useRef(false);
   const activeMessageId = useRef<string | null>(null);
   const lastMessageWasUser = useRef(false);
   const insideThinkTag = useRef(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   // Username could come from auth context or props in a real app
   const username = user.email;
@@ -39,6 +52,42 @@ const HomePage: React.FC = () => {
     }
   }, [lastMessage]);
 
+  // Remove the interval checks and simplify
+  useEffect(() => {
+    // This effect ensures that when no message is being streamed (activeMessageId is null),
+    // we turn off streaming for all messages correctly
+    const hasStreamingMessages = messages.some(
+      (msg) => msg.isStreaming === true
+    );
+    const activeMessageExists = activeMessageId.current !== null;
+
+    if (!activeMessageExists && hasStreamingMessages) {
+      console.log(
+        "No active message but found streaming messages - fixing state"
+      );
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.isStreaming ? { ...msg, isStreaming: false } : msg
+        )
+      );
+    }
+  }, [messages]);
+
+  // Effect to ensure streaming stops when websocket disconnects
+  useEffect(() => {
+    if (!isConnected) {
+      // Clear any active message
+      activeMessageId.current = null;
+
+      // Clear any streaming state on all messages
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.isStreaming ? { ...msg, isStreaming: false } : msg
+        )
+      );
+    }
+  }, [isConnected]);
+
   // Attempt to reconnect on input change after disconnection
   useEffect(() => {
     if (!isConnected && hasUserTyped.current) {
@@ -51,18 +100,86 @@ const HomePage: React.FC = () => {
     }
   }, [isConnected]);
 
+  // Add scroll detection
+  useEffect(() => {
+    const checkScroll = () => {
+      if (!chatContainerRef.current) return;
+
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      // Show scroll button when not at bottom
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isAtBottom);
+    };
+
+    const container = chatContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", checkScroll);
+      // Also check on resize
+      window.addEventListener("resize", checkScroll);
+
+      return () => {
+        container.removeEventListener("scroll", checkScroll);
+        window.removeEventListener("resize", checkScroll);
+      };
+    }
+  }, [inputStarted]);
+
+  const scrollToBottom = () => {
+    chatContainerRef.current?.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  // Debug function to log message streaming states
+  const logMessageStates = (msgs: ChatMessage[]) => {
+    console.log("Current message streaming states:");
+    msgs.forEach((msg) => {
+      if (msg.isStreaming) {
+        console.log(
+          `Message ${msg.id.substring(0, 8)}: isStreaming=${msg.isStreaming}`
+        );
+      }
+    });
+  };
+
   /**
    * Handle incoming messages from the WebSocket
    */
   const handleIncomingMessage = (wsResponse: any) => {
     if (!wsResponse) return;
 
-    console.log("Handling websocket response:", JSON.stringify(wsResponse));
-
     // Process for text message chunks
     if (typeof wsResponse.data?.text === "string") {
       const isComplete = !!wsResponse.data.isComplete;
       let text = wsResponse.data.text || "";
+
+      // IMPORTANT: Force update all messages to not streaming when complete is received
+      if (isComplete && activeMessageId.current) {
+        // First update the active message directly to stop streaming
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === activeMessageId.current
+              ? { ...msg, isStreaming: false }
+              : msg
+          )
+        );
+        console.log(
+          `Explicitly setting message ${activeMessageId.current.substring(
+            0,
+            8
+          )} to not streaming`
+        );
+
+        // Also mark that there's no active message
+        activeMessageId.current = null;
+
+        // Skip rest of processing if we just got an empty completion message
+        if (!text) {
+          return;
+        }
+      }
 
       // Process think tags
       if (text.includes("<think>")) {
@@ -120,14 +237,22 @@ const HomePage: React.FC = () => {
             isStreaming: !isComplete,
           };
 
-          console.log("Creating new AI message after user message");
+          console.log(
+            "Creating new AI message after user message, isStreaming:",
+            !isComplete
+          );
 
           // If this is a complete one-chunk message, clear the active message
           if (isComplete) {
             activeMessageId.current = null;
           }
 
-          return [...prevMessages, newMessage];
+          const updatedMessages = [...prevMessages, newMessage];
+          if (isComplete) {
+            // Additional check for debugging
+            logMessageStates(updatedMessages);
+          }
+          return updatedMessages;
         } else {
           // Find the active AI message to update
           const activeMessageIndex = prevMessages.findIndex(
@@ -154,13 +279,20 @@ const HomePage: React.FC = () => {
               isStreaming: !isComplete,
             };
 
-            console.log("Creating new AI message (fallback)");
+            console.log(
+              "Creating new AI message (fallback), isStreaming:",
+              !isComplete
+            );
 
             if (isComplete) {
               activeMessageId.current = null;
             }
 
-            return [...prevMessages, newMessage];
+            const updatedMessages = [...prevMessages, newMessage];
+            if (isComplete) {
+              logMessageStates(updatedMessages);
+            }
+            return updatedMessages;
           }
 
           // Update the existing message with the new chunk, only if text is non-empty
@@ -176,12 +308,15 @@ const HomePage: React.FC = () => {
 
             console.log(
               "Updating existing AI message, new length:",
-              updatedMessages[activeMessageIndex].content.length
+              updatedMessages[activeMessageIndex].content.length,
+              "isStreaming:",
+              !isComplete
             );
 
             // If this is the end of the stream, clear the active message
             if (isComplete) {
               activeMessageId.current = null;
+              logMessageStates(updatedMessages);
             }
 
             return updatedMessages;
@@ -195,6 +330,10 @@ const HomePage: React.FC = () => {
               isStreaming: false,
             };
             activeMessageId.current = null;
+
+            console.log("Marking message as complete (empty final chunk)");
+            logMessageStates(updatedMessages);
+
             return updatedMessages;
           }
 
@@ -243,6 +382,7 @@ const HomePage: React.FC = () => {
         content: messageText.trim(),
         role: "system",
         timestamp: new Date(),
+        isStreaming: false, // Ensure system messages are never streaming
       };
 
       setMessages((prev) => [...prev, systemMessage]);
@@ -271,6 +411,7 @@ const HomePage: React.FC = () => {
         content: message,
         role: "user",
         timestamp: new Date(),
+        isStreaming: false, // User messages are never streaming
       };
 
       // Add to local messages immediately
@@ -290,40 +431,45 @@ const HomePage: React.FC = () => {
     [isConnected, sendMessage, username, connectionId]
   );
 
-  return (
-    <div className="flex flex-col h-[calc(100vh-129px)]">
-      {!isConnected && (
-        <div className="bg-yellow-100 p-2 text-center text-yellow-800">
-          Connecting to chat server...
-        </div>
-      )}
+  const handleClearChat = () => {
+    setMessages([]);
+    setInputStarted(false);
+  };
 
+  // Directly implement a strong cleanup effect that runs on every render to fix any stuck streaming messages
+  useEffect(() => {
+    // Run this check on every message update
+    if (messages.length > 0) {
+      // If we have no active message but some messages are marked as streaming, fix them
+      const shouldFixMessages =
+        !activeMessageId.current && messages.some((msg) => msg.isStreaming);
+
+      if (shouldFixMessages) {
+        console.log("Forced cleanup of streaming states");
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isStreaming ? { ...msg, isStreaming: false } : msg
+          )
+        );
+      }
+    }
+  }, [messages]);
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-80px)]">
+      {/* Connection and error status notifications */}
       {authError && (
-        <div className="bg-red-100 p-2 text-center text-red-800">
+        <div className="bg-destructive/10 p-2 text-center text-destructive flex items-center justify-center gap-2">
+          <AlertCircle className="h-4 w-4" />
           {authError}
         </div>
       )}
 
-      {!inputStarted ? (
-        <div className="flex flex-col items-center justify-center h-full">
-          <div className="w-full max-w-xl p-4">
-            <InputBar
-              onSubmit={handleSubmit}
-              disabled={!isConnected}
-              autoFocus={true}
-              className="w-full"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto px-4">
-            <div className="container mx-auto max-w-4xl py-4">
-              <ChatContainer messages={messages} />
-            </div>
-          </div>
-          <div className="w-full bg-background">
-            <div className="container mx-auto max-w-4xl p-4">
+      {/* Main chat area */}
+      <div className="flex flex-col h-full">
+        {!inputStarted ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="w-full max-w-xl p-4">
               <InputBar
                 onSubmit={handleSubmit}
                 disabled={!isConnected}
@@ -332,8 +478,40 @@ const HomePage: React.FC = () => {
               />
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col h-full">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto px-4 relative scroll-smooth"
+            >
+              <div className="container mx-auto max-w-4xl py-4">
+                <ChatContainer messages={messages} />
+              </div>
+
+              {/* Scroll to bottom button */}
+              {showScrollButton && (
+                <Button
+                  className="absolute bottom-4 right-6 h-10 w-10 rounded-full shadow-md"
+                  onClick={scrollToBottom}
+                  aria-label="Scroll to bottom"
+                >
+                  <ArrowDown className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
+            <div className="w-full bg-background border-t">
+              <div className="container mx-auto max-w-4xl p-4">
+                <InputBar
+                  onSubmit={handleSubmit}
+                  disabled={!isConnected}
+                  autoFocus={true}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
