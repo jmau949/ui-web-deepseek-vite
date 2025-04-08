@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -121,4 +122,20 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Markdown content styling */
+.markdown-content {
+  @apply prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:underline-offset-2 prose-code:bg-muted prose-code:p-1 prose-code:rounded prose-code:text-muted-foreground prose-pre:bg-muted prose-pre:text-muted-foreground prose-ol:text-muted-foreground prose-ul:text-muted-foreground;
+}
+
+/* Blinking cursor for streaming text */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
 }

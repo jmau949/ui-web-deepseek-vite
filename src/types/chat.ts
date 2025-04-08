@@ -5,4 +5,6 @@ export interface ChatMessage {
   content: string;
   role: ChatRole;
   timestamp: Date;
+  isStreaming?: boolean;
+  parentMessageId?: string;
 }
