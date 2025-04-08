@@ -57,11 +57,11 @@ const MetaTags: React.FC<MetaTagsProps> = ({
 
     // Canonical Link Tag
     // Helps prevent duplicate content issues by specifying the preferred URL of a page.
-    setLinkTag("canonical", "REPLACEME");
+    setLinkTag("canonical", "ai.jonathanmau.com");
 
     // Hreflang Link Tag (example for English US)
     // Helps search engines serve the correct language or regional URL in search results.
-    setLinkTag("alternate", "REPLACEME", { hreflang: "en-us" });
+    setLinkTag("alternate", "ai.jonathanmau.com", { hreflang: "en-us" });
 
     // Structured Data using JSON-LD
     // Provides search engines with context about your site, potentially leading to rich search results.
@@ -76,11 +76,11 @@ const MetaTags: React.FC<MetaTagsProps> = ({
     scriptElement.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
-      url: "REPLACEME",
-      name: "REPLACEME",
+      url: "ai.jonathanmau.com",
+      name: "ai.jonathanmau.com",
       potentialAction: {
         "@type": "SearchAction",
-        target: "REPLACEME?q={search_term_string}",
+        target: "ai.jonathanmau.com?q={search_term_string}",
         "query-input": "required name=search_term_string",
       },
     });
@@ -104,7 +104,7 @@ const MetaTags: React.FC<MetaTagsProps> = ({
     // Twitter Meta Tags for Social Sharing
     // Optimize the way your page appears when shared on Twitter.
     setMetaTag("twitter:card", "summary_large_image");
-    setMetaTag("twitter:site", "@REPLACEME");
+    // setMetaTag("twitter:site", "@REPLACEME");
     setMetaTag("twitter:title", title);
     setMetaTag("twitter:description", description);
     if (twitterImageUrl) setMetaTag("twitter:image", twitterImageUrl);
