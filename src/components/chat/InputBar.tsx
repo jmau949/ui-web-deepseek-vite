@@ -64,7 +64,7 @@ export const InputBar: React.FC<InputBarProps> = ({
     <div className={cn("relative w-full", className)}>
       <form
         onSubmit={handleSubmit}
-        className="flex w-full gap-2 items-end relative border rounded-xl bg-background shadow-sm focus-within:ring-1 focus-within:ring-ring overflow-hidden"
+        className="relative border rounded-xl bg-background shadow-sm focus-within:ring-1 focus-within:ring-ring overflow-hidden"
       >
         {/* Feature buttons - currently non-functional but add visual appeal
         <div className="flex items-center pl-3 gap-1.5">
@@ -90,43 +90,45 @@ export const InputBar: React.FC<InputBarProps> = ({
           </Button>
         </div> */}
 
-        <Textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          rows={rows}
-          disabled={isSubmitting || disabled}
-          className="flex-grow min-h-10 resize-none p-3 border-0 focus-visible:ring-0 bg-transparent"
-          aria-label="Message input"
-        />
+        <div className="flex items-center">
+          <Textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            rows={rows}
+            disabled={isSubmitting || disabled}
+            className="flex-grow min-h-10 resize-none py-2.5 pl-3 pr-12 border-0 focus-visible:ring-0 bg-transparent"
+            aria-label="Message input"
+          />
 
-        {/* Voice input button - non-functional but adds visual appeal */}
-        {/* <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 mr-0.5 text-muted-foreground hover:text-foreground"
-          disabled={isSubmitting || disabled || !!input.trim()}
-        >
-          <Mic className="h-4 w-4" />
-          <span className="sr-only">Voice input</span>
-        </Button> */}
+          {/* Voice input button - non-functional but adds visual appeal */}
+          {/* <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 mr-0.5 text-muted-foreground hover:text-foreground"
+            disabled={isSubmitting || disabled || !!input.trim()}
+          >
+            <Mic className="h-4 w-4" />
+            <span className="sr-only">Voice input</span>
+          </Button> */}
 
-        <Button
-          type="submit"
-          disabled={!input.trim() || isSubmitting || disabled}
-          size="icon"
-          className="h-10 w-10 mr-2 aspect-square"
-        >
-          {isSubmitting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-          <span className="sr-only">Send</span>
-        </Button>
+          <Button
+            type="submit"
+            disabled={!input.trim() || isSubmitting || disabled}
+            size="icon"
+            className="absolute right-0 top-0 bottom-0 h-full w-10 rounded-l-none rounded-r-xl flex-shrink-0 flex items-center justify-center"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+            <span className="sr-only">Send</span>
+          </Button>
+        </div>
       </form>
 
       {/* Helper text */}
