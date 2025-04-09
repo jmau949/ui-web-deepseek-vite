@@ -4,17 +4,8 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ChatMessage } from "@/types/chat";
 import useWebSocket from "../hooks/useWebSockets";
 import { useAuth } from "@/auth/AuthProvider";
-import {
-  AlertCircle,
-  MoreVertical,
-  RefreshCw,
-  User,
-  ArrowDown,
-  Trash2,
-  Settings,
-} from "lucide-react";
+import { AlertCircle, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 // Define your WebSocket server URL
 const WS_URL = import.meta.env.VITE_WS_URL;
@@ -430,11 +421,6 @@ const HomePage: React.FC = () => {
     },
     [isConnected, sendMessage, username, connectionId]
   );
-
-  const handleClearChat = () => {
-    setMessages([]);
-    setInputStarted(false);
-  };
 
   // Directly implement a strong cleanup effect that runs on every render to fix any stuck streaming messages
   useEffect(() => {

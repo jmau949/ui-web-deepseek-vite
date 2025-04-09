@@ -52,7 +52,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ messages }) => {
           </p>
         </div>
       ) : (
-        Object.entries(messageGroups).map(([date, dateMessages], i) => (
+        Object.entries(messageGroups).map(([date, dateMessages]) => (
           <div key={date} className="space-y-2">
             <div className="relative py-1">
               <div className="absolute inset-0 flex items-center">
