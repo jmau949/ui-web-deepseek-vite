@@ -6,6 +6,7 @@ export interface ChatMessage {
   role: ChatRole;
   timestamp: Date;
   isStreaming?: boolean;
+  isThinking?: boolean;
   parentMessageId?: string;
   isFailed?: boolean;
   isRetrying?: boolean;

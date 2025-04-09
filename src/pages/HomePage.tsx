@@ -173,21 +173,118 @@ const HomePage: React.FC = () => {
       }
 
       // Process think tags
+      let thinkContent = "";
+      let hasThinkTag = false;
+      let thinkEnded = false;
+
       if (text.includes("<think>")) {
+        hasThinkTag = true;
+        const parts = text.split("<think>");
+        text = parts[0];
+        thinkContent = parts[1] || "";
         insideThinkTag.current = true;
-        // Keep only the text before the <think> tag
-        text = text.split("<think>")[0].trim();
       }
 
-      if (insideThinkTag.current) {
-        if (text.includes("</think>")) {
-          insideThinkTag.current = false;
-          // Keep only the text after the </think> tag
-          text = text.split("</think>").slice(1).join("</think>").trim();
+      if (text.includes("</think>")) {
+        hasThinkTag = true;
+        thinkEnded = true;
+        const parts = text.split("</think>");
+        // If there was content before the </think>, it's part of the think content
+        if (insideThinkTag.current) {
+          thinkContent += parts[0];
+          text = parts.slice(1).join("</think>");
         } else {
-          // Inside a think tag, don't add any text
-          text = "";
+          // If </think> appears without a preceding <think> in this chunk
+          text = parts.slice(1).join("</think>");
         }
+        // We reached the end of a think section
+        insideThinkTag.current = false;
+      } else if (insideThinkTag.current) {
+        // We're in the middle of a think tag
+        thinkContent += text;
+        text = "";
+      }
+
+      // Handle think messages - either show the latest content or remove when finished
+      if ((hasThinkTag || insideThinkTag.current) && !thinkEnded) {
+        // Use a delayed update approach to prevent rapid flickering of content
+        setTimeout(() => {
+          setMessages((prevMessages) => {
+            // Find any existing thinking message
+            const existingThinkingMessage = prevMessages.find(
+              (msg) => msg.isThinking
+            );
+
+            // First, remove any previous thinking messages
+            const messagesWithoutThinking = prevMessages.filter(
+              (msg) => !msg.isThinking
+            );
+
+            // If we have think content to display and we're inside a think tag
+            if (thinkContent.trim() && insideThinkTag.current) {
+              let finalThinkContent = thinkContent.trim();
+
+              // If there's an existing thinking message, append to it instead of replacing
+              if (existingThinkingMessage) {
+                // Start with existing content
+                finalThinkContent = existingThinkingMessage.content;
+
+                // Only append new content if it's not already included
+                if (
+                  thinkContent.trim() &&
+                  !finalThinkContent.includes(thinkContent.trim())
+                ) {
+                  // Add a line break for better readability
+                  finalThinkContent += finalThinkContent
+                    ? "\n\n" + thinkContent.trim()
+                    : thinkContent.trim();
+
+                  // Keep a reasonable number of characters to prevent excessive growth
+                  // while maintaining readability
+                  if (finalThinkContent.length > 1000) {
+                    // Keep most recent content with enough context
+                    const lines = finalThinkContent.split("\n");
+                    if (lines.length > 15) {
+                      // Keep the last 15 lines for context
+                      finalThinkContent =
+                        "...\n\n" + lines.slice(-15).join("\n");
+                    }
+                  }
+                }
+              }
+
+              // Create new message or update existing one
+              const newId =
+                activeMessageId.current ||
+                `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              activeMessageId.current = newId;
+
+              const newMessage: ChatMessage = {
+                id: newId,
+                content: finalThinkContent,
+                role: "system",
+                timestamp: new Date(),
+                isStreaming: true,
+                isThinking: true,
+              };
+
+              return [...messagesWithoutThinking, newMessage];
+            }
+
+            return messagesWithoutThinking;
+          });
+        }, 100); // Small delay to batch updates and reduce flickering
+      }
+
+      // When we encounter </think>, make sure to remove all thinking messages
+      if (thinkEnded) {
+        console.log("Think ended - removing thinking messages");
+        setMessages((prevMessages) => {
+          const messagesWithoutThinking = prevMessages.filter(
+            (msg) => !msg.isThinking
+          );
+          return messagesWithoutThinking;
+        });
       }
 
       // Skip empty chunks
