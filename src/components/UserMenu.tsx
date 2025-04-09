@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getUserInitials, getAvatarColor } from "../utils/userUtils";
+import { getUserInitials } from "../utils/userUtils";
 
 interface UserMenuProps {
   firstName: string;
@@ -28,14 +28,11 @@ export const UserMenu: React.FC<UserMenuProps> = ({
 }) => {
   const initials = getUserInitials(firstName, lastName);
   const fullName = `${firstName} ${lastName}`;
-  const avatarColor = getAvatarColor(fullName);
 
   if (isMobile) {
     return (
       <div className="flex items-center gap-3">
-        <div
-          className={`h-8 w-8 rounded-full ${avatarColor} text-white flex items-center justify-center font-medium text-sm`}
-        >
+        <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium text-sm">
           {initials}
         </div>
         <div className="flex-1">
@@ -60,7 +57,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          className={`h-9 w-9 rounded-full ${avatarColor} text-white flex items-center justify-center`}
+          className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
           aria-label="User menu"
         >
           <span className="font-medium text-sm">{initials}</span>
