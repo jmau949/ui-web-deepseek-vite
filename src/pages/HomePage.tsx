@@ -4,7 +4,7 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ChatMessage } from "@/types/chat";
 import useWebSocket from "../hooks/useWebSockets";
 import { useAuth } from "@/auth/AuthProvider";
-import { AlertCircle, ArrowDown } from "lucide-react";
+import { AlertCircle, ArrowDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Define your WebSocket server URL
@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
   const [inputStarted, setInputStarted] = useState<boolean>(false);
   const [reconnectTrigger, setReconnectTrigger] = useState(0);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const hasUserTyped = useRef(false);
   const activeMessageId = useRef<string | null>(null);
   const lastMessageWasUser = useRef(false);
@@ -39,6 +40,8 @@ const HomePage: React.FC = () => {
   // Process incoming messages from the WebSocket
   useEffect(() => {
     if (lastMessage) {
+      // Stop the processing animation when we receive any message
+      setIsProcessing(false);
       handleIncomingMessage(lastMessage);
     }
   }, [lastMessage]);
@@ -144,6 +147,9 @@ const HomePage: React.FC = () => {
     // Check for error responses
     if (wsResponse.data?.error === true) {
       console.error("WebSocket error response:", wsResponse.data);
+
+      // Stop the processing animation on error
+      setIsProcessing(false);
 
       // Create a friendly error message
       const errorMessage: ChatMessage = {
@@ -509,6 +515,9 @@ const HomePage: React.FC = () => {
     (message: string) => {
       if (!message.trim() || !isConnected) return;
 
+      // Start the processing animation
+      setIsProcessing(true);
+
       // Mark that the last message was from a user,
       // so the next AI response creates a new message bubble
       lastMessageWasUser.current = true;
@@ -593,6 +602,18 @@ const HomePage: React.FC = () => {
             >
               <div className="container mx-auto max-w-4xl py-4">
                 <ChatContainer messages={messages} />
+
+                {/* Processing animation */}
+                {isProcessing && (
+                  <div className="flex items-center justify-center py-4 animate-in fade-in duration-300">
+                    <div className="flex items-center space-x-2 bg-muted/50 px-4 py-2 rounded-full shadow-sm">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">
+                        Processing...
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Scroll to bottom button */}
@@ -610,7 +631,8 @@ const HomePage: React.FC = () => {
               <div className="container mx-auto max-w-4xl p-4">
                 <InputBar
                   onSubmit={handleSubmit}
-                  disabled={!isConnected}
+                  disabled={!isConnected || isProcessing}
+                  isSubmitting={isProcessing}
                   autoFocus={true}
                   className="w-full"
                 />
