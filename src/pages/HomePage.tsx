@@ -145,8 +145,11 @@ const HomePage: React.FC = () => {
     if (!wsResponse) return;
 
     // Check for error responses
-    if (wsResponse.data?.error === true) {
-      console.error("WebSocket error response:", wsResponse.data);
+    if (
+      wsResponse.data?.error === true ||
+      wsResponse.message === "Endpoint request timed out"
+    ) {
+      console.error("WebSocket error response:", wsResponse.data || wsResponse);
 
       // Stop the processing animation on error
       setIsProcessing(false);
