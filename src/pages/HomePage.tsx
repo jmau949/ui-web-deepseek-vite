@@ -585,7 +585,7 @@ const HomePage: React.FC = () => {
       <div className="flex flex-col h-full">
         {!inputStarted ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-full max-w-xl p-4">
+            <div className="w-full max-w-2xl p-4">
               <InputBar
                 onSubmit={handleSubmit}
                 disabled={!isConnected}
@@ -600,7 +600,7 @@ const HomePage: React.FC = () => {
               ref={chatContainerRef}
               className="flex-1 overflow-y-auto px-4 relative scroll-smooth"
             >
-              <div className="container mx-auto max-w-4xl py-4">
+              <div className="container mx-auto max-w-6xl py-4">
                 <ChatContainer messages={messages} />
 
                 {/* Processing animation */}
@@ -628,7 +628,7 @@ const HomePage: React.FC = () => {
               )}
             </div>
             <div className="w-full bg-background border-t">
-              <div className="container mx-auto max-w-4xl p-4">
+              <div className="container mx-auto max-w-6xl p-4">
                 <InputBar
                   onSubmit={handleSubmit}
                   disabled={!isConnected || isProcessing}

@@ -79,7 +79,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             isUser
               ? "bg-primary text-primary-foreground rounded-tr-none"
               : isThinking
-              ? "bg-slate-100 border border-slate-300 text-slate-800 rounded-tl-none w-[500px] min-h-[120px]"
+              ? "bg-slate-100 border border-slate-300 text-slate-800 rounded-tl-none min-h-[120px] w-full"
               : isError
               ? "bg-amber-50 border border-amber-200 text-amber-900 rounded-tl-none"
               : "bg-card border border-border text-card-foreground rounded-tl-none"
@@ -126,15 +126,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               <div className="text-sm text-slate-700 font-semibold mb-3 flex items-center border-b border-slate-200 pb-2">
                 <BrainCircuit className="h-4 w-4 mr-2 text-slate-600" />
                 <span className="mr-1">AI is thinking...</span>
-                <span className="inline-flex">
-                  <span className="animate-pulse mx-0.5 delay-0">.</span>
-                  <span className="animate-pulse mx-0.5 animation-delay-200">
-                    .
-                  </span>
-                  <span className="animate-pulse mx-0.5 animation-delay-400">
-                    .
-                  </span>
-                </span>
               </div>
             )}
             {isUser ? (
