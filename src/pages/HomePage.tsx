@@ -4,7 +4,7 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ChatMessage } from "@/types/chat";
 import useWebSocket from "../hooks/useWebSockets";
 import { useAuth } from "@/auth/AuthProvider";
-import { AlertCircle, ArrowDown } from "lucide-react";
+import { AlertCircle, ArrowDown, Cloud, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Define your WebSocket server URL
@@ -140,6 +140,30 @@ const HomePage: React.FC = () => {
    */
   const handleIncomingMessage = (wsResponse: any) => {
     if (!wsResponse) return;
+
+    // Check for error responses
+    if (wsResponse.data?.error === true) {
+      console.error("WebSocket error response:", wsResponse.data);
+
+      // Create a friendly error message
+      const errorMessage: ChatMessage = {
+        id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        content:
+          "🤖 Friendly update! Our GPUs are taking a scheduled nap from 12am-9am Central Time, or they might turned off due to high demand. We're keeping costs down by being smart about when our engines run. Please check back in a bit! ✨",
+        role: "system",
+        timestamp: new Date(),
+        isStreaming: false,
+        isError: true,
+      };
+
+      // Add to messages
+      setMessages((prev) => [...prev, errorMessage]);
+
+      // Clear any active streaming message
+      activeMessageId.current = null;
+
+      return;
+    }
 
     // Process for text message chunks
     if (typeof wsResponse.data?.text === "string") {

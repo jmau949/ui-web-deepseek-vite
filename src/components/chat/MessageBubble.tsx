@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types/chat";
 import ReactMarkdown from "react-markdown";
-import { User, Bot, BrainCircuit } from "lucide-react";
+import { User, Bot, BrainCircuit, AlertCircle } from "lucide-react";
 
 // Define keyframes for the subtle flashing effect
 const thinkingAnimation = `@keyframes think-flash {
@@ -18,6 +18,7 @@ interface MessageBubbleProps {
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isUser = message.role === "user";
   const isThinking = Boolean(message.isThinking);
+  const isError = Boolean(message.isError);
   // Force component to re-render when streaming state changes by using a ref to track previous state
   const isStreamingRef = useRef(message.isStreaming);
   const [, forceUpdate] = useState({});
@@ -45,18 +46,27 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         )}
         data-streaming={isStreaming ? "true" : "false"}
         data-thinking={isThinking ? "true" : "false"}
+        data-error={isError ? "true" : "false"}
       >
         {/* Avatar */}
         <div
           className={cn(
             "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-            isUser ? "bg-primary" : isThinking ? "bg-slate-500" : "bg-accent"
+            isUser
+              ? "bg-primary"
+              : isThinking
+              ? "bg-slate-500"
+              : isError
+              ? "bg-amber-400"
+              : "bg-accent"
           )}
         >
           {isUser ? (
             <User className="h-4 w-4 text-primary-foreground" />
           ) : isThinking ? (
             <BrainCircuit className="h-4 w-4 text-slate-50" />
+          ) : isError ? (
+            <AlertCircle className="h-4 w-4 text-amber-950" />
           ) : (
             <Bot className="h-4 w-4 text-accent-foreground" />
           )}
@@ -70,6 +80,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               ? "bg-primary text-primary-foreground rounded-tr-none"
               : isThinking
               ? "bg-slate-100 border border-slate-300 text-slate-800 rounded-tl-none w-[500px] min-h-[120px]"
+              : isError
+              ? "bg-amber-50 border border-amber-200 text-amber-900 rounded-tl-none"
               : "bg-card border border-border text-card-foreground rounded-tl-none"
           )}
           style={
@@ -94,6 +106,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                   ? "bg-primary -left-2"
                   : isThinking
                   ? "bg-slate-100 border border-slate-300 -right-2"
+                  : isError
+                  ? "bg-amber-50 border border-amber-200 -right-2"
                   : "bg-card border border-border -right-2"
               )}
               style={
@@ -129,7 +143,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               <div
                 className={cn(
                   "markdown-content prose-sm max-w-none break-words",
-                  isThinking && "text-slate-700"
+                  isThinking && "text-slate-700",
+                  isError && "text-amber-900 font-medium"
                 )}
               >
                 {isThinking ? (

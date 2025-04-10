@@ -10,6 +10,7 @@ export interface ChatMessage {
   parentMessageId?: string;
   isFailed?: boolean;
   isRetrying?: boolean;
+  isError?: boolean;
   metadata?: {
     model?: string;
     tokens?: {
