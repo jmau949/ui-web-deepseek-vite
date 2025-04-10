@@ -30,26 +30,35 @@ export const InputBar: React.FC<InputBarProps> = ({
   // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
-      // Reset to 1 row to get accurate scrollHeight measurement
-      textareaRef.current.style.height = "auto";
-
-      // Use scrollHeight to determine the actual height needed
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const lineHeight =
-        parseInt(getComputedStyle(textareaRef.current).lineHeight) || 20; // Default to 20px if not set
-
-      // Calculate rows based on scroll height and line height
-      const calculatedRows = Math.ceil(scrollHeight / lineHeight);
-
-      // Also consider line breaks for accurate row count
+      // First, handle line breaks - this is simple and reliable
       const lineBreakRows = input.split("\n").length;
 
-      // Use the larger of the two calculations
-      const newRows = Math.min(
-        Math.max(1, Math.max(calculatedRows, lineBreakRows)),
-        maxRows
-      );
-      setRows(newRows);
+      if (lineBreakRows > 1) {
+        // If we have line breaks, use them directly
+        setRows(Math.min(lineBreakRows, maxRows));
+        return;
+      }
+
+      // For single line content, only expand if it's long enough to likely wrap
+      // This is a simple heuristic that avoids DOM manipulation
+      const CHARS_PER_LINE = 50; // Estimated chars that fit in a line
+
+      if (input.length > CHARS_PER_LINE) {
+        // Reset height to measure scrollHeight accurately
+        textareaRef.current.style.height = "auto";
+
+        // Get the scrollHeight and lineHeight
+        const scrollHeight = textareaRef.current.scrollHeight;
+        const lineHeight =
+          parseInt(getComputedStyle(textareaRef.current).lineHeight) || 20;
+
+        // Calculate rows
+        const calculatedRows = Math.ceil(scrollHeight / lineHeight);
+        setRows(Math.min(calculatedRows, maxRows));
+      } else {
+        // Short content stays at 1 row
+        setRows(1);
+      }
     }
   }, [input, maxRows]);
 
