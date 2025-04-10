@@ -24,43 +24,43 @@ export const InputBar: React.FC<InputBarProps> = ({
   disabled = false,
 }) => {
   const [input, setInput] = useState("");
-  const [rows, setRows] = useState(1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea based on content
-  useEffect(() => {
-    if (textareaRef.current) {
-      // First, handle line breaks - this is simple and reliable
-      const lineBreakRows = input.split("\n").length;
+  // Function to adjust textarea height based on content
+  const adjustHeight = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
 
-      if (lineBreakRows > 1) {
-        // If we have line breaks, use them directly
-        setRows(Math.min(lineBreakRows, maxRows));
-        return;
-      }
+    // Reset height temporarily to get the correct scrollHeight
+    textarea.style.height = "auto";
 
-      // For single line content, only expand if it's long enough to likely wrap
-      // This is a simple heuristic that avoids DOM manipulation
-      const CHARS_PER_LINE = 50; // Estimated chars that fit in a line
+    // Get the textarea's base height when empty (one line)
+    const baseHeight = 38; // Default approximate height for one line
 
-      if (input.length > CHARS_PER_LINE) {
-        // Reset height to measure scrollHeight accurately
-        textareaRef.current.style.height = "auto";
+    // Set the height based on content but cap it according to maxRows
+    const maxHeight = baseHeight * maxRows;
+    const newHeight = Math.min(textarea.scrollHeight, maxHeight);
 
-        // Get the scrollHeight and lineHeight
-        const scrollHeight = textareaRef.current.scrollHeight;
-        const lineHeight =
-          parseInt(getComputedStyle(textareaRef.current).lineHeight) || 20;
-
-        // Calculate rows
-        const calculatedRows = Math.ceil(scrollHeight / lineHeight);
-        setRows(Math.min(calculatedRows, maxRows));
-      } else {
-        // Short content stays at 1 row
-        setRows(1);
-      }
+    // Only expand if content requires more height than base height
+    if (newHeight > baseHeight) {
+      textarea.style.height = `${newHeight}px`;
+    } else {
+      textarea.style.height = `${baseHeight}px`;
     }
-  }, [input, maxRows]);
+  };
+
+  // Adjust height on input change
+  useEffect(() => {
+    adjustHeight();
+  }, [input]);
+
+  // Adjust height on window resize
+  useEffect(() => {
+    window.addEventListener("resize", adjustHeight);
+    return () => {
+      window.removeEventListener("resize", adjustHeight);
+    };
+  }, []);
 
   // Auto-focus the textarea on component mount
   useEffect(() => {
@@ -123,10 +123,10 @@ export const InputBar: React.FC<InputBarProps> = ({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            rows={rows}
             disabled={isSubmitting || disabled}
-            className="flex-grow min-h-10 resize-none py-2.5 pl-3 pr-12 border-0 focus-visible:ring-0 bg-transparent"
+            className="flex-grow min-h-10 h-10 resize-none py-2.5 pl-3 pr-12 border-0 focus-visible:ring-0 bg-transparent"
             aria-label="Message input"
+            style={{ overflow: "hidden" }}
           />
 
           {/* Voice input button - non-functional but adds visual appeal */}
