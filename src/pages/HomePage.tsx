@@ -4,7 +4,7 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ChatMessage } from "@/types/chat";
 import useWebSocket from "../hooks/useWebSockets";
 import { useAuth } from "@/auth/AuthProvider";
-import { AlertCircle, ArrowDown, Cloud, RefreshCw } from "lucide-react";
+import { AlertCircle, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Define your WebSocket server URL
