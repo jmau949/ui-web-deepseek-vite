@@ -18,7 +18,7 @@ export const InputBar: React.FC<InputBarProps> = ({
   onSubmit,
   placeholder = "Type a message...",
   isSubmitting = false,
-  maxRows = 5,
+  maxRows = 20,
   autoFocus = true,
   className = "",
   disabled = false,
@@ -30,8 +30,25 @@ export const InputBar: React.FC<InputBarProps> = ({
   // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
-      const lineCount = input.split("\n").length;
-      const newRows = Math.min(Math.max(1, lineCount), maxRows);
+      // Reset to 1 row to get accurate scrollHeight measurement
+      textareaRef.current.style.height = "auto";
+
+      // Use scrollHeight to determine the actual height needed
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const lineHeight =
+        parseInt(getComputedStyle(textareaRef.current).lineHeight) || 20; // Default to 20px if not set
+
+      // Calculate rows based on scroll height and line height
+      const calculatedRows = Math.ceil(scrollHeight / lineHeight);
+
+      // Also consider line breaks for accurate row count
+      const lineBreakRows = input.split("\n").length;
+
+      // Use the larger of the two calculations
+      const newRows = Math.min(
+        Math.max(1, Math.max(calculatedRows, lineBreakRows)),
+        maxRows
+      );
       setRows(newRows);
     }
   }, [input, maxRows]);
