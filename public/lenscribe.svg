@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f44336" />
+      <stop offset="100%" stop-color="#ff9800" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Infinity symbol with brain integration - perfectly centered horizontally and vertically -->
+  <g transform="translate(0, 15) scale(0.75)">
+    <path d="M15,50 C15,35 25,25 40,25 C55,25 60,35 70,50 C80,65 85,75 100,75 C115,75 125,65 125,50 C125,35 115,25 100,25 C85,25 80,35 70,50 C60,65 55,75 40,75 C25,75 15,65 15,50 Z" 
+          fill="none" stroke="url(#gradient)" stroke-width="6" stroke-linecap="round" />
+          
+    <!-- Neural network nodes -->
+    <circle cx="40" cy="25" r="5" fill="#f44336" />
+    <circle cx="100" cy="25" r="5" fill="#ff9800" />
+    <circle cx="40" cy="75" r="5" fill="#ff9800" />
+    <circle cx="100" cy="75" r="5" fill="#f44336" />
+    <circle cx="70" cy="50" r="5" fill="#ff5722" />
+    <circle cx="25" cy="50" r="5" fill="#f44336" opacity="0.8" />
+    <circle cx="115" cy="50" r="5" fill="#ff9800" opacity="0.8" />
+    
+    <!-- Connection lines -->
+    <line x1="40" y1="25" x2="70" y2="50" stroke="#f44336" stroke-width="1.5" />
+    <line x1="100" y1="25" x2="70" y2="50" stroke="#ff9800" stroke-width="1.5" />
+    <line x1="40" y1="75" x2="70" y2="50" stroke="#ff9800" stroke-width="1.5" />
+    <line x1="100" y1="75" x2="70" y2="50" stroke="#f44336" stroke-width="1.5" />
+  </g>
+</svg>
