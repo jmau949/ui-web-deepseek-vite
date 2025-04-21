@@ -40,8 +40,19 @@ const HomePage: React.FC = () => {
   // Process incoming messages from the WebSocket
   useEffect(() => {
     if (lastMessage) {
-      // Stop the processing animation when we receive any message
-      setIsProcessing(false);
+      // Check if this is just a processing status message
+      const isProcessingStatusMessage =
+        lastMessage.data?.message === "Processing your request..." ||
+        lastMessage.message === "Processing your request..." ||
+        // Check for the exact message format in user query (data.message and timestamp pattern)
+        (lastMessage.data?.message?.includes("Processing your request") &&
+          lastMessage.data?.timestamp);
+
+      // Only stop the processing animation for non-processing messages
+      if (!isProcessingStatusMessage) {
+        setIsProcessing(false);
+      }
+
       handleIncomingMessage(lastMessage);
     }
   }, [lastMessage]);
