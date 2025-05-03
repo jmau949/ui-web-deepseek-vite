@@ -158,7 +158,8 @@ const HomePage: React.FC = () => {
     // Check for error responses
     if (
       wsResponse.data?.error === true ||
-      wsResponse.message === "Endpoint request timed out"
+      wsResponse.message === "Endpoint request timed out" ||
+      wsResponse.message === "Internal server error"
     ) {
       console.error("WebSocket error response:", wsResponse.data || wsResponse);
 
