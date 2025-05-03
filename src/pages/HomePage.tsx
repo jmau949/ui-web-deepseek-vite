@@ -162,6 +162,17 @@ const HomePage: React.FC = () => {
     ) {
       console.error("WebSocket error response:", wsResponse.data || wsResponse);
 
+      // Ignore "Endpoint request timed out" errors if we're already streaming a message
+      if (
+        wsResponse.message === "Endpoint request timed out" &&
+        activeMessageId.current !== null
+      ) {
+        console.log(
+          "Ignoring API Gateway timeout error during active streaming"
+        );
+        return;
+      }
+
       // Stop the processing animation on error
       setIsProcessing(false);
 
