@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { ChatMessage } from "@/types/chat";
 import { Bot } from "lucide-react";
@@ -9,15 +9,6 @@ interface ChatContainerProps {
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({ messages }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   // Group messages by date
   const groupMessagesByDate = (msgs: ChatMessage[]) => {
@@ -74,7 +65,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ messages }) => {
         ))
       )}
 
-      {/* Empty div at the end to scroll to */}
+      {/* Keep the reference div but don't automatically scroll to it */}
       <div ref={messagesEndRef} />
     </div>
   );
