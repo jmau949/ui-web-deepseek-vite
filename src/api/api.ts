@@ -93,7 +93,6 @@ api.interceptors.response.use(
         }
 
         if (isRefreshTokenRequest) {
-          logError("Refresh token endpoint returned 401", error.toString());
           await logoutUser();
           return Promise.reject(
             new Error("Authentication failed. Please log in again.")
@@ -120,7 +119,6 @@ api.interceptors.response.use(
           // Token refresh failed
           isRefreshingToken = false;
           onTokenRefreshFailed();
-          logError("Token refresh failed", refreshError as string);
           await logoutUser();
           return Promise.reject(
             new Error("Your session has expired. Please log in again.")
@@ -155,7 +153,6 @@ api.interceptors.response.use(
     }
 
     if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
-      logError("Request timed out:", error.toString());
       return Promise.reject(
         new Error(
           "The request took too long to complete. Please try again later."
@@ -163,8 +160,7 @@ api.interceptors.response.use(
       );
     }
 
-    logError(error);
-    notifyAdmin("Critical API failure", error);
+
     return Promise.reject(error);
   }
 );

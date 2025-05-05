@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import errorLoggingService from "../components/ErrorBoundary/errorLoggingService";
-import { AxiosError } from "axios";
 
 type ErrorContext = Record<string, unknown>;
 
