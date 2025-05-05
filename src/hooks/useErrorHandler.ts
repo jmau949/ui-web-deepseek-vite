@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import errorLoggingService from "../components/ErrorBoundary/errorLoggingService";
+import { AxiosError } from "axios";
 
 type ErrorContext = Record<string, unknown>;
 
@@ -26,16 +27,78 @@ export const useErrorHandler = (defaultContext?: ErrorContext) => {
    */
   const handleError = useCallback(
     (error: unknown, operation?: string, additionalContext?: ErrorContext) => {
-      const errorObj =
-        error instanceof Error ? error : new Error(String(error));
+      // Create meaningful error message for different error types
+      let errorMessage: string;
+      let originalError: unknown = error;
+      let errorData: Record<string, unknown> = {};
+
+      // Handle different error types
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error && typeof error === "object") {
+        if ("message" in error && typeof error.message === "string") {
+          errorMessage = error.message;
+        } else if (
+          "response" in error &&
+          error.response &&
+          typeof error.response === "object"
+        ) {
+          // Handle Axios errors
+          if ("data" in error.response) {
+            if (typeof error.response.data === "string") {
+              errorMessage = error.response.data;
+            } else if (
+              typeof error.response.data === "object" &&
+              error.response.data !== null
+            ) {
+              // Extract error message from API response
+              errorMessage =
+                (error.response.data as any).message ||
+                (error.response.data as any).error ||
+                JSON.stringify(error.response.data);
+              errorData.responseData = error.response.data;
+            } else {
+              errorMessage = `API error with status ${
+                (error as any).response.status
+              }`;
+            }
+          } else {
+            errorMessage = `API error with status ${
+              (error as any).response.status
+            }`;
+          }
+          errorData.status = (error as any).response.status;
+        } else {
+          // Stringified objects like [object Object]
+          try {
+            errorMessage = JSON.stringify(error);
+          } catch {
+            errorMessage = String(error);
+          }
+        }
+      } else {
+        errorMessage = String(error);
+      }
+
+      // Create normalized error object
+      const errorObj = error instanceof Error ? error : new Error(errorMessage);
+
+      // Add the error data to the error object for reference
+      if (Object.keys(errorData).length > 0) {
+        (errorObj as any).errorData = errorData;
+      }
+
+      // Store the original error if it wasn't an Error instance
+      if (!(error instanceof Error)) {
+        (errorObj as any).originalError = originalError;
+      }
 
       // Extract request ID from the error response if available
       let requestId;
 
       if (error && typeof error === "object" && "response" in error) {
         // For Axios errors
-        // @ts-ignore
-        requestId = error.response?.headers?.["x-request-id"];
+        requestId = (error as any).response?.headers?.["x-request-id"];
       }
 
       // Fall back to the last known request ID from session storage if not in the response
@@ -49,6 +112,7 @@ export const useErrorHandler = (defaultContext?: ErrorContext) => {
         ...additionalContext,
         operation,
         requestId: requestId || "unknown",
+        errorData,
       };
 
       // Log the error to the external service with request ID for tracing

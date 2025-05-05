@@ -58,6 +58,37 @@ class ErrorLoggingService {
   }
 
   /**
+   * Helper method to safely stringify objects for logging
+   * Prevents [object Object] issues in logs by properly formatting objects
+   *
+   * @param value - The value to stringify
+   * @returns A string representation of the value
+   */
+  private safeStringify(value: unknown): string {
+    if (value === null) return "null";
+    if (value === undefined) return "undefined";
+
+    if (value instanceof Error) {
+      return JSON.stringify(
+        {
+          name: value.name,
+          message: value.message,
+          stack: value.stack,
+          ...(value as any), // Include any custom properties
+        },
+        null,
+        2
+      );
+    }
+
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (err) {
+      return String(value);
+    }
+  }
+
+  /**
    * Public method to log an error.
    * It prints error information to the console and, if in production,
    * sends the error details to an external logging service.
@@ -73,16 +104,33 @@ class ErrorLoggingService {
     context?: Record<string, unknown>,
     userId?: string
   ): void {
-    // Log the error to the console.
-    console.error("Error caught by error logging service:", error);
+    // Normalize the error if it's not an Error instance
+    const normalizedError =
+      error instanceof Error ? error : new Error(this.safeStringify(error));
+
+    // Log the error to the console with proper formatting
+    console.error("Error caught by error logging service:", normalizedError);
 
     // If errorInfo is provided, log the component stack.
     if (errorInfo) {
       console.error("Component stack:", errorInfo.componentStack);
     }
 
+    // Log context with proper formatting if available
+    if (context) {
+      // Create a formatted version of the context with properly stringified values
+      const formattedContext: Record<string, string> = {};
+      Object.entries(context).forEach(([key, value]) => {
+        formattedContext[key] = this.safeStringify(value);
+      });
+      console.error("Error context:", formattedContext);
+    }
+
     // Extract requestId from context or try to retrieve it from sessionStorage
-    let requestId = context?.requestId as string || sessionStorage.getItem("lastRequestId") || undefined;
+    let requestId =
+      (context?.requestId as string) ||
+      sessionStorage.getItem("lastRequestId") ||
+      undefined;
 
     // sentry will not be initialized in development, but logging service might be
     if (import.meta.env.MODE === "development") {
@@ -91,15 +139,17 @@ class ErrorLoggingService {
     }
 
     const logData: ErrorLogData = {
-      error,
+      error: normalizedError,
       errorInfo,
       context,
       userId,
       timestamp: new Date().toISOString(),
-      requestId
+      requestId,
     };
-    
-    console.log("sending to sentry, log service", logData);
+
+    // Safely log the data to console
+    console.info("sending to sentry, log service", this.safeStringify(logData));
+
     this.sendToSentry(logData);
 
     // In production, send the error log to the external logging service. (splunk, datadog)
@@ -108,7 +158,7 @@ class ErrorLoggingService {
 
   /**
    * Private method to send error data to Sentry.
-   * 
+   *
    * @param {ErrorLogData} logData - The error log data to send.
    */
   private sendToSentry(logData: ErrorLogData): void {
@@ -117,7 +167,7 @@ class ErrorLoggingService {
         componentStack: logData.errorInfo?.componentStack,
         ...logData.context,
         userId: logData.userId,
-        requestId: logData.requestId
+        requestId: logData.requestId,
       },
     });
   }
@@ -134,7 +184,7 @@ class ErrorLoggingService {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
-      
+
       // Add X-Request-ID header if a requestId is available
       if (logData.requestId) {
         headers["X-Request-ID"] = logData.requestId;
@@ -148,7 +198,7 @@ class ErrorLoggingService {
         // If sending the error log fails, handle the error.
         // In production, fail silently; in development, log the failure.
         if (import.meta.env.MODE === "development") {
-          console.error("development err:", err);
+          console.error("development err:", this.safeStringify(err));
         }
       });
     }
@@ -157,7 +207,7 @@ class ErrorLoggingService {
   /**
    * Public method to set the last request ID in session storage.
    * This can be used by API interceptors to store the request ID from responses.
-   * 
+   *
    * @param {string} requestId - The request ID to store.
    */
   public setLastRequestId(requestId: string): void {
@@ -168,7 +218,7 @@ class ErrorLoggingService {
 
   /**
    * Public method to get the last known request ID from session storage.
-   * 
+   *
    * @returns {string|null} The last known request ID or null if not available.
    */
   public getLastRequestId(): string | null {
