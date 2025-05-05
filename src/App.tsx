@@ -16,6 +16,7 @@ import SignUpPage from "./pages/auth/SignUpPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ConfirmEmailPage from "./pages/auth/ConfirmEmailPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ContactSupportPage from "./pages/ContactSupportPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
 
 /**
@@ -38,6 +39,10 @@ const App: React.FC = () => (
                 />
                 <Route path="/confirm-email" element={<ConfirmEmailPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route
+                  path="/contact-support"
+                  element={<ContactSupportPage />}
+                />
 
                 {/* Private routes with AuthenticatedLayout */}
                 <Route
