@@ -4,7 +4,6 @@ import axios, {
   AxiosError,
   AxiosRequestConfig,
 } from "axios";
-import { logError, notifyAdmin } from "../utils/errorHandling";
 import { logoutUser } from "./user/userService";
 import { refreshToken } from "./user/userService"; // Import refreshToken function
 import { v4 as uuidv4 } from "uuid";
