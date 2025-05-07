@@ -267,7 +267,6 @@ const HomePage: React.FC = () => {
       // Concatenate think content
       if (thinkContent) {
         allThinkContent.current += thinkContent;
-        console.log("THINK_DEBUG - Complete Content:", allThinkContent.current);
       }
 
       // Reset think content when think tag ends
@@ -327,9 +326,6 @@ const HomePage: React.FC = () => {
         return;
       }
 
-      console.log(
-        `Message chunk: "${text.substring(0, 20)}..." - Complete: ${isComplete}`
-      );
 
       setMessages((prevMessages) => {
         // If the last message was from a user, or no active message,
@@ -427,13 +423,6 @@ const HomePage: React.FC = () => {
                 : updatedMessages[activeMessageIndex].content,
               isStreaming: !isComplete,
             };
-
-            console.log(
-              "Updating existing AI message, new length:",
-              updatedMessages[activeMessageIndex].content.length,
-              "isStreaming:",
-              !isComplete
-            );
 
             // If this is the end of the stream, clear the active message
             if (isComplete) {

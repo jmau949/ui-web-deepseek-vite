@@ -150,8 +150,6 @@ const useWebSocket = (url: string): UseWebSocketReturn => {
       ws.onmessage = (event) => {
         try {
           const response = JSON.parse(event.data) as WebSocketResponse;
-          console.log("Received message:", response);
-
           // If this is the welcome message, store the connection ID
           if (response.message === "Connected" && response.connectionId) {
             setConnectionId(response.connectionId);

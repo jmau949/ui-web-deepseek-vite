@@ -148,14 +148,12 @@ export const confirmForgotPassword = async (
 
 export const refreshToken = async (): Promise<void> => {
   try {
-    console.log("REFRESHING TOKEN")
     await api.post(
       "/api/v1/users/refresh-token",
       {},
       { withCredentials: true }
     );
   } catch (error: any) {
-    console.log('error', error)
     handleApiError(error, "Token refresh failed. Please try again later.");
   }
 };
@@ -174,7 +172,6 @@ export const sendEmailSupportMessage = async (
       { withCredentials: true }
     );
   } catch (error: any) {
-    console.log("error", error);
     handleApiError(error, "Token refresh failed. Please try again later.");
   }
 };
