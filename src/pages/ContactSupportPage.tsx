@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import { useErrorHandler } from "../hooks/useErrorHandler";
-import { submitSupportRequest } from "../api/support/supportService";
+import { sendEmailSupportMessage } from "../api/user/userService";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -20,14 +20,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 
-const SUPPORT_CATEGORIES = [
-  "Account Access",
-  "Technical Issue",
-  "Feature Request",
-  "Billing",
-  "Other",
-];
-
 const ContactSupportPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -35,37 +27,20 @@ const ContactSupportPage: React.FC = () => {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [formData, setFormData] = useState({
-    name: user?.name || "",
     email: user?.email || "",
-    subject: "",
     message: "",
-    category: SUPPORT_CATEGORIES[0],
   });
 
   const handleError = useErrorHandler({ component: "ContactSupportPage" });
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
-    if (!formData.name.trim()) {
-      setStatusMessage("Please enter your name");
-      return false;
-    }
-    if (!formData.email.trim()) {
-      setStatusMessage("Please enter your email");
-      return false;
-    }
-    if (!formData.subject.trim()) {
-      setStatusMessage("Please enter a subject");
-      return false;
-    }
     if (!formData.message.trim()) {
       setStatusMessage("Please enter your message");
       return false;
@@ -86,17 +61,17 @@ const ContactSupportPage: React.FC = () => {
     setStatusMessage("");
 
     try {
-      await submitSupportRequest(formData);
+      await sendEmailSupportMessage(formData.message, formData.email);
       setStatus("success");
       setStatusMessage(
-        "Your support request has been submitted successfully. We'll get back to you shortly."
+        "Your message has been submitted successfully. We'll get back to you shortly."
       );
     } catch (error: any) {
       setStatus("error");
       setStatusMessage(
-        error.message || "Failed to submit your request. Please try again."
+        error.message || "Failed to submit your message. Please try again."
       );
-      handleError(error, "submitSupportRequest");
+      handleError(error, "sendEmailSupportMessage");
     } finally {
       setLoading(false);
     }
@@ -149,18 +124,6 @@ const ContactSupportPage: React.FC = () => {
           {status !== "success" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Your name"
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -169,36 +132,6 @@ const ContactSupportPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="your.email@example.com"
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {SUPPORT_CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  placeholder="Brief description of your issue"
                   disabled={loading}
                 />
               </div>
@@ -223,7 +156,7 @@ const ContactSupportPage: React.FC = () => {
                     <span>Submitting...</span>
                   </>
                 ) : (
-                  "Submit Request"
+                  "Submit Message"
                 )}
               </Button>
             </form>

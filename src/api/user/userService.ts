@@ -159,3 +159,22 @@ export const refreshToken = async (): Promise<void> => {
     handleApiError(error, "Token refresh failed. Please try again later.");
   }
 };
+
+export const sendEmailSupportMessage = async (
+  message: string,
+  email: string
+): Promise<void> => {
+  try {
+    await api.post(
+      "/api/v1/users/support",
+      {
+        message: message,
+        email: email,
+      },
+      { withCredentials: true }
+    );
+  } catch (error: any) {
+    console.log("error", error);
+    handleApiError(error, "Token refresh failed. Please try again later.");
+  }
+};
