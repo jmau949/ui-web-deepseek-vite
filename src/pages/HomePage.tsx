@@ -7,6 +7,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { AlertCircle, ArrowDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+
 // Define your WebSocket server URL
 const WS_URL = import.meta.env.VITE_WS_URL;
 
@@ -24,6 +25,8 @@ const HomePage: React.FC = () => {
   const { user } = useAuth();
   // Username could come from auth context or props in a real app
   const username = user.email;
+  // Add ref to store all think content
+  const allThinkContent = useRef("");
 
   // Initialize WebSocket connection with reconnect support
   const { isConnected, sendMessage, lastMessage, connectionId, authError } =
@@ -261,54 +264,29 @@ const HomePage: React.FC = () => {
         text = "";
       }
 
+      // Concatenate think content
+      if (thinkContent) {
+        allThinkContent.current += thinkContent;
+        console.log("THINK_DEBUG - Complete Content:", allThinkContent.current);
+      }
+
+      // Reset think content when think tag ends
+      if (thinkEnded) {
+        allThinkContent.current = "";
+      }
+
       // Handle think messages - either show the latest content or remove when finished
       if ((hasThinkTag || insideThinkTag.current) && !thinkEnded) {
         // Use a delayed update approach to prevent rapid flickering of content
         setTimeout(() => {
           setMessages((prevMessages) => {
-            // Find any existing thinking message
-            const existingThinkingMessage = prevMessages.find(
-              (msg) => msg.isThinking
-            );
-
             // First, remove any previous thinking messages
             const messagesWithoutThinking = prevMessages.filter(
               (msg) => !msg.isThinking
             );
 
             // If we have think content to display and we're inside a think tag
-            if (thinkContent.trim() && insideThinkTag.current) {
-              let finalThinkContent = thinkContent.trim();
-
-              // If there's an existing thinking message, append to it instead of replacing
-              if (existingThinkingMessage) {
-                // Start with existing content
-                finalThinkContent = existingThinkingMessage.content;
-
-                // Only append new content if it's not already included
-                if (
-                  thinkContent.trim() &&
-                  !finalThinkContent.includes(thinkContent.trim())
-                ) {
-                  // Add a line break for better readability
-                  finalThinkContent += finalThinkContent
-                    ? "\n\n" + thinkContent.trim()
-                    : thinkContent.trim();
-
-                  // Keep a reasonable number of characters to prevent excessive growth
-                  // while maintaining readability
-                  if (finalThinkContent.length > 1000) {
-                    // Keep most recent content with enough context
-                    const lines = finalThinkContent.split("\n");
-                    if (lines.length > 15) {
-                      // Keep the last 15 lines for context
-                      finalThinkContent =
-                        "...\n\n" + lines.slice(-15).join("\n");
-                    }
-                  }
-                }
-              }
-
+            if (allThinkContent.current && insideThinkTag.current) {
               // Create new message or update existing one
               const newId =
                 activeMessageId.current ||
@@ -317,7 +295,7 @@ const HomePage: React.FC = () => {
 
               const newMessage: ChatMessage = {
                 id: newId,
-                content: finalThinkContent,
+                content: allThinkContent.current,
                 role: "system",
                 timestamp: new Date(),
                 isStreaming: true,
