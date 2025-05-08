@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { ArrowLeft } from "lucide-react";
 
 const loginSchema = z.object({
   email: z
@@ -104,6 +105,20 @@ const LoginPage: React.FC = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <div className="mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="flex items-center gap-1 -ml-2"
+          >
+            <Link to="/">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+        </div>
+
         <h1 className="mb-4 text-2xl font-bold text-center">Sign In</h1>
 
         {/* Animated Error Message */}
