@@ -7,13 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, MessageSquare, LogIn, Menu } from "lucide-react";
+import { ChevronDown, MessageSquare, LogIn, Home, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { sendEmailSupportMessage } from "../api/user/userService";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 /**
  * Simplified navbar with model selector on the left and user actions on the right.
@@ -21,12 +21,15 @@ import { Link } from "react-router-dom";
  */
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+
+  const isLoginPage = location.pathname === "/login";
 
   useEffect(() => {
     if (user) {
@@ -53,6 +56,72 @@ const Navbar: React.FC = () => {
       setDesktopMenuOpen(false);
       setMobileDropdownOpen(false);
     }
+  };
+
+  // Navigation button based on current location
+  const NavButton = () => {
+    // If user is logged in, show user menu instead
+    if (user) {
+      return (
+        <UserMenu
+          firstName={user.firstName}
+          lastName={user.lastName}
+          onLogout={logout}
+        />
+      );
+    }
+
+    // If on login page, show Home button
+    if (isLoginPage) {
+      return (
+        <Button asChild variant="outline">
+          <Link to="/">
+            <Home className="mr-2 h-4 w-4" /> Home
+          </Link>
+        </Button>
+      );
+    }
+
+    // Otherwise show Login button
+    return (
+      <Button asChild variant="outline">
+        <Link to="/login">
+          <LogIn className="mr-2 h-4 w-4" /> Login
+        </Link>
+      </Button>
+    );
+  };
+
+  // Mobile navigation button
+  const MobileNavButton = () => {
+    // If user is logged in, show logout button
+    if (user) {
+      return (
+        <Button variant="outline" className="w-full" onClick={() => logout()}>
+          Logout ({user.firstName})
+        </Button>
+      );
+    }
+
+    // If on login page, show Home button
+    if (isLoginPage) {
+      return (
+        <Button asChild variant="outline" className="w-full">
+          <Link to="/">
+            <Home className="mr-2 h-4 w-4" /> Home
+          </Link>
+        </Button>
+      );
+    }
+
+    // Otherwise show Login button
+    return (
+      <Button asChild variant="outline" className="w-full">
+        <Link to="/login">
+          <LogIn className="mr-2 h-4 w-4" /> Login
+        </Link>
+      </Button>
+    );
   };
 
   return (
@@ -134,19 +203,7 @@ const Navbar: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {user ? (
-            <UserMenu
-              firstName={user.firstName}
-              lastName={user.lastName}
-              onLogout={logout}
-            />
-          ) : (
-            <Button asChild variant="outline">
-              <Link to="/login">
-                <LogIn className="mr-2 h-4 w-4" /> Login
-              </Link>
-            </Button>
-          )}
+          <NavButton />
         </div>
 
         {/* Mobile Menu (Conditional Render) */}
@@ -205,21 +262,7 @@ const Navbar: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {user ? (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => logout()}
-              >
-                Logout ({user.firstName})
-              </Button>
-            ) : (
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/login">
-                  <LogIn className="mr-2 h-4 w-4" /> Login
-                </Link>
-              </Button>
-            )}
+            <MobileNavButton />
           </div>
         )}
       </nav>
