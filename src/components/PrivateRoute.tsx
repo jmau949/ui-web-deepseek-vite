@@ -33,7 +33,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   // if no user is found (user is null), redirect the user to the login page.
   // The 'replace' prop ensures that the redirect replaces the current entry in the history stack,
   // so the user cannot navigate back to the protected route.
-  if (authChecked && !user) return <Navigate to="/login" replace />;
+  if (authChecked && !user) return <Navigate to="/chat" replace />;
 
   // If a user is authenticated or we are using a cached user while final auth check completes,
   // render the children components to allow access to the protected route.

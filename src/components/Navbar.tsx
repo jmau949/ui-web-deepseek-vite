@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { UserMenu } from "./UserMenu";
 import {
@@ -7,25 +7,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, MessageSquare } from "lucide-react";
+import { ChevronDown, MessageSquare, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { sendEmailSupportMessage } from "../api/user/userService";
+import { Link } from "react-router-dom";
 
 /**
- * Simplified navbar with model selector on the left and logout on the right
- * Using shadcn components
+ * Simplified navbar with model selector on the left and user actions on the right.
+ * Now always visible, with conditional rendering for authenticated users.
  */
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const [message, setMessage] = useState("");
-  const [email, setEmail] = useState(user?.email || "");
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // The currently selected model
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email || "");
+    } else {
+      setEmail("");
+    }
+  }, [user]);
+
   const selectedModel = "Deepseek-r1";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,13 +42,10 @@ const Navbar: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Call the support message API
       await sendEmailSupportMessage(message, email);
     } catch (error) {
-      // Log error but don't show to user - behave as if successful
       console.error("Failed to submit feedback:", error);
     } finally {
-      // Reset form and close dropdown regardless of success/failure
       setMessage("");
       setIsSubmitting(false);
       setIsOpen(false);
@@ -50,7 +55,6 @@ const Navbar: React.FC = () => {
   return (
     <header className="w-full bg-background border-b border-border sticky top-0 z-50">
       <nav className="px-4 py-3 md:px-6 md:py-4 flex justify-between items-center">
-        {/* Model dropdown menu using shadcn components - left aligned */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2">
@@ -65,7 +69,6 @@ const Navbar: React.FC = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* User menu with logout - right aligned */}
         <div className="flex items-center gap-4">
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
@@ -84,6 +87,7 @@ const Navbar: React.FC = () => {
                     placeholder="Your email (optional)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={!!user}
                   />
                 </div>
                 <div className="space-y-2">
@@ -110,11 +114,19 @@ const Navbar: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <UserMenu
-            firstName={user.firstName}
-            lastName={user.lastName}
-            onLogout={logout}
-          />
+          {user ? (
+            <UserMenu
+              firstName={user.firstName}
+              lastName={user.lastName}
+              onLogout={logout}
+            />
+          ) : (
+            <Button asChild variant="outline">
+              <Link to="/login">
+                <LogIn className="mr-2 h-4 w-4" /> Login
+              </Link>
+            </Button>
+          )}
         </div>
       </nav>
     </header>

@@ -1,15 +1,14 @@
 import React from "react";
 import ChatComponent from "@/components/chat/ChatComponent";
-import { useAuth } from "@/auth/AuthProvider";
-import usePrivateChat from "@/hooks/usePrivateChat";
+import usePublicChat from "@/hooks/usePublicChat";
 import { Loader2, AlertCircle } from "lucide-react";
 
-const HomePage: React.FC = () => {
-  const { user } = useAuth();
-  const { isLoading, error, wsParams, setReconnectTrigger } = usePrivateChat();
-
-  // The username comes from the authenticated user's email
-  const username = user.email;
+/**
+ * Public chat page accessible without authentication
+ * Uses the chat component with public access token
+ */
+const PublicChatPage: React.FC = () => {
+  const { isLoading, error, wsParams, setReconnectTrigger } = usePublicChat();
 
   // Show loading state while getting the token
   if (isLoading) {
@@ -36,18 +35,18 @@ const HomePage: React.FC = () => {
     );
   }
 
-  // Allow automatic reconnect when needed
+  // Handle reconnection
   const handleReconnect = () => {
     setReconnectTrigger((prev: number) => prev + 1);
   };
 
+  // Render the chat component with the websocket parameters
   return (
     <ChatComponent
-      username={username}
       wsConnectionParams={wsParams}
       onReconnectNeeded={handleReconnect}
     />
   );
 };
 
-export default HomePage;
+export default PublicChatPage;

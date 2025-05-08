@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar"; // Navbar will be in RootLayout
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
@@ -7,14 +7,14 @@ interface AuthenticatedLayoutProps {
 
 /**
  * Layout component for authenticated pages
- * Includes the navigation bar and wraps authenticated content
+ * Wraps authenticated content. Navbar is handled by RootLayout.
  */
 const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({
   children,
 }) => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      {/* <Navbar /> */}
       {children}
     </div>
   );

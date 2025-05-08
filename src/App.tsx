@@ -11,6 +11,7 @@ import { PersistGate } from "redux-persist/integration/react";
 
 // Direct imports instead of lazy loading
 import HomePage from "./pages/HomePage";
+import PublicChatPage from "./pages/PublicChatPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -43,6 +44,8 @@ const App: React.FC = () => (
                   path="/contact-support"
                   element={<ContactSupportPage />}
                 />
+                {/* Public chat route */}
+                <Route path="/chat" element={<PublicChatPage />} />
 
                 {/* Private routes with AuthenticatedLayout */}
                 <Route

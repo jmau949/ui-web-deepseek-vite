@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import Navbar from "@/components/Navbar";
 // import { clsx } from "clsx";
 // import { getTheme } from "@/actions/settings-actions";
 // import { Theme } from '@/types/settings';
@@ -20,16 +21,18 @@ const RootLayout: React.FC<RootLayoutProps> = (props) => {
 
   return (
     <div
-    // className={clsx(
-    //   "bg-grey5",
-    //   theme === Theme.LIGHT && 'theme:light',
-    //   theme === Theme.LIGHT_HIGH_CONTRAST && 'theme:light-high-contrast',
-    //   theme === Theme.DARK && 'theme:dark',
-    //   theme === Theme.DARK_HIGH_CONTRAST && 'theme:dark-high-contrast',
-    //   theme === Theme.DARK && 'dark',
-    //   theme === Theme.DARK_HIGH_CONTRAST && 'dark'
-    // )}
+      className="min-h-screen flex flex-col"
+      // className={clsx(
+      //   "bg-grey5",
+      //   theme === Theme.LIGHT && 'theme:light',
+      //   theme === Theme.LIGHT_HIGH_CONTRAST && 'theme:light-high-contrast',
+      //   theme === Theme.DARK && 'theme:dark',
+      //   theme === Theme.DARK_HIGH_CONTRAST && 'theme:dark-high-contrast',
+      //   theme === Theme.DARK && 'dark',
+      //   theme === Theme.DARK_HIGH_CONTRAST && 'dark'
+      // )}
     >
+      <Navbar />
       {props.children}
     </div>
   );
