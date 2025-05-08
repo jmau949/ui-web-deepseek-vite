@@ -24,8 +24,9 @@ const Navbar: React.FC = () => {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -49,7 +50,8 @@ const Navbar: React.FC = () => {
     } finally {
       setMessage("");
       setIsSubmitting(false);
-      setIsOpen(false);
+      setDesktopMenuOpen(false);
+      setMobileDropdownOpen(false);
     }
   };
 
@@ -85,7 +87,10 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-4">
-          <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+          <DropdownMenu
+            open={desktopMenuOpen}
+            onOpenChange={setDesktopMenuOpen}
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
@@ -147,7 +152,10 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu (Conditional Render) */}
         {mobileMenuOpen && (
           <div className="w-full mt-2 flex flex-col gap-2 md:hidden">
-            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+            <DropdownMenu
+              open={mobileDropdownOpen}
+              onOpenChange={setMobileDropdownOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
