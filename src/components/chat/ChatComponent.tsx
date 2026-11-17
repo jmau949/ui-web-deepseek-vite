@@ -193,7 +193,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       const errorMessage: ChatMessage = {
         id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         content:
-          "🤖 Friendly update! Our GPUs are napping during off-hours. Gpus are run Monday-Friday from 10am-6pm PST. Weekends remain scaled down for cost savings. If you are receving this message during business hours, instance spot prices are also to high at the moment Please check back later.",
+          "🤖 Friendly update! The GPUs that power this chatbot are currently turned off to save on hosting costs, so the AI can't reply right now. Please check back later.",
         role: "system",
         timestamp: new Date(),
         isStreaming: false,
